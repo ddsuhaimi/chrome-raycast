@@ -80,7 +80,6 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      console.log(e.key)
       if (e.key === "Escape") {
         e.preventDefault();
         closePalette();
