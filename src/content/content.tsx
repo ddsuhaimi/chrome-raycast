@@ -1,13 +1,28 @@
 import { createRoot } from "react-dom/client";
 import { CommandPalette } from "./CommandPalette";
-import "../styles/index.css";
+import stylestr from "../styles/index.css?inline";
 
-// Create container for React app
-const container = document.createElement("div");
-container.id = "raychrome-root";
-document.body.appendChild(container);
+// Create container for the shadow host
+const host = document.createElement("div");
+host.id = "raychrome-root";
+document.body.appendChild(host);
 
-const root = createRoot(container);
+// Attach Shadow DOM
+const shadow = host.attachShadow({ mode: "open" });
+
+// Inject style into Shadow DOM
+const style = document.createElement("style");
+// Use .replace(/:root/g, ":host ") for compatibility instead of .replaceAll
+const replacedStylestr = stylestr.replace(/:root/g, ":host #raychrome-root");
+style.textContent = replacedStylestr;
+shadow.appendChild(style);
+
+// Create a container for React app inside shadow root
+const reactContainer = document.createElement("div");
+reactContainer.id = "raychrome-react-root";
+shadow.appendChild(reactContainer);
+
+const root = createRoot(reactContainer);
 
 let visible = false;
 
@@ -37,4 +52,3 @@ chrome.runtime.onMessage.addListener((msg) => {
     });
   }
 });
-
