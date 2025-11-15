@@ -1,37 +1,11 @@
 import { createRoot } from "react-dom/client";
 import { CommandPalette } from "./CommandPalette";
-import styles from "../styles/index.css?inline";
+import "../styles/index.css";
 
-// Create shadow host
-const shadowHost = document.createElement("div");
-shadowHost.id = "raychrome-shadow-host";
-document.body.appendChild(shadowHost);
-
-// Create shadow DOM for CSS isolation
-const shadowRoot = shadowHost.attachShadow({ mode: "open" });
-
-// Inject styles into shadow DOM with CSS reset
-const styleElement = document.createElement("style");
-// Replace :root with :host for Shadow DOM compatibility
-const shadowStyles = styles.replace(/:root/g, ":host");
-styleElement.textContent = `
-  /* Tailwind styles with :host instead of :root */
-  ${shadowStyles}
-  
-  /* Additional isolation - prevent host page font inheritance */
-  :host {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-`;
-shadowRoot.appendChild(styleElement);
-
-// Create React root container inside shadow DOM
+// Create container for React app
 const container = document.createElement("div");
 container.id = "raychrome-root";
-shadowRoot.appendChild(container);
+document.body.appendChild(container);
 
 const root = createRoot(container);
 
