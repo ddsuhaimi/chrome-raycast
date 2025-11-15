@@ -3,7 +3,20 @@ chrome.commands.onCommand.addListener((command) => {
   if (command === "toggle-palette") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id)
-        chrome.tabs.sendMessage(tabs[0].id, { type: "TOGGLE_PALETTE" });
+        chrome.tabs.sendMessage(tabs[0].id, {
+          type: "TOGGLE_PALETTE",
+          mode: "tab",
+        });
+    });
+  }
+
+  if (command === "toggle-palette-action") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id)
+        chrome.tabs.sendMessage(tabs[0].id, {
+          type: "TOGGLE_PALETTE",
+          mode: "action",
+        });
     });
   }
 });
@@ -12,7 +25,13 @@ chrome.commands.onCommand.addListener((command) => {
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "GET_ALL_TABS") {
     chrome.tabs.query({}, (tabs) => {
-      sendResponse({ tabs });
+      // Sort tabs by lastAccessed (most recent first)
+      const sortedTabs = tabs.sort((a, b) => {
+        const timeA = a.lastAccessed || 0;
+        const timeB = b.lastAccessed || 0;
+        return timeB - timeA; // Descending order (most recent first)
+      });
+      sendResponse({ tabs: sortedTabs });
     });
     return true; // Keep the message channel open for async response
   }

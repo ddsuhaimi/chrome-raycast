@@ -24,7 +24,14 @@
         "default": "Ctrl+K",
         "mac": "Command+K"
       },
-      "description": "Open Raydash command palette"
+      "description": "Toggle command palette (tab mode)"
+    },
+    "toggle-palette-action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
+      },
+      "description": "Toggle command palette (action mode)"
     }
   }
 }

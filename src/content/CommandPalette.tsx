@@ -13,10 +13,11 @@ interface Tab {
 
 interface CommandPaletteProps {
   onClose?: () => void;
+  initialQuery?: string;
 }
 
-export function CommandPalette({ onClose }: CommandPaletteProps) {
-  const [query, setQuery] = useState("");
+export function CommandPalette({ onClose, initialQuery = "" }: CommandPaletteProps) {
+  const [query, setQuery] = useState(initialQuery);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [tabs, setTabs] = useState<Tab[]>([]);
   const selectedItemRef = useRef<HTMLLIElement>(null);
