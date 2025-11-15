@@ -26,10 +26,14 @@ const root = createRoot(reactContainer);
 
 let visible = false;
 
+function togglePalette() {
+  visible = !visible;
+  root.render(visible ? <CommandPalette onClose={() => togglePalette()} /> : null);
+}
+
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "TOGGLE_PALETTE") {
-    visible = !visible;
-    root.render(visible ? <CommandPalette /> : null);
+    togglePalette();
   }
 
   if (msg.type === "COPY_TO_CLIPBOARD") {

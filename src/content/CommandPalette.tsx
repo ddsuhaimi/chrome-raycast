@@ -11,7 +11,11 @@ interface Tab {
   favIconUrl?: string;
 }
 
-export function CommandPalette() {
+interface CommandPaletteProps {
+  onClose?: () => void;
+}
+
+export function CommandPalette({ onClose }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [tabs, setTabs] = useState<Tab[]>([]);
@@ -76,9 +80,10 @@ export function CommandPalette() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      console.log(e.key)
       if (e.key === "Escape") {
-        const root = document.getElementById("raychrome-root");
-        if (root) root.innerHTML = "";
+        e.preventDefault();
+        closePalette();
       }
 
       if (e.key === "ArrowDown") {
@@ -102,7 +107,11 @@ export function CommandPalette() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selectedIndex, results, isActionMode]);
+  }, [selectedIndex, results, isActionMode, onClose, handleSelection]);
+
+  function closePalette() {
+    onClose?.();
+  }
 
   function handleSelection(item: Command | Tab) {
     if (isActionMode) {
@@ -119,14 +128,19 @@ export function CommandPalette() {
       }
     }
     // Close the command palette
-    const root = document.getElementById("raychrome-root");
-    if (root) root.innerHTML = "";
+    closePalette();
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start justify-center z-9999 pt-24 font-sans antialiased">
-      <Card className="w-[640px] bg-zinc-900 text-white border-zinc-800 shadow-2xl">
-        <CardContent className="p-4 space-y-3">
+    <div 
+      className="text-sm fixed inset-0 bg-black/20 flex items-start justify-center z-9999 pt-24 font-sans antialiased"
+      onClick={closePalette}
+    >
+      <Card 
+        className="w-[640px] bg-white text-gray-900 border-gray-300 shadow-md rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <CardContent className="p-2">
           <Input
             autoFocus
             placeholder={
@@ -134,13 +148,13 @@ export function CommandPalette() {
                 ? "Type a command..."
                 : "Search tabs... (type '>' for commands)"
             }
-            className="bg-transparent border-b border-zinc-700 rounded-none px-2 text-lg focus-visible:ring-0 focus-visible:border-zinc-500"
+            className="mb-1 bg-transparent border-b border-gray-300 rounded-none px-2 text-lg focus-visible:ring-0 focus-visible:border-blue-500"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <ul className="max-h-96 overflow-y-auto space-y-1">
+          <ul className="max-h-96 overflow-y-auto">
             {results.length === 0 ? (
-              <li className="p-3 text-zinc-400 text-center">
+              <li className="p-2 text-gray-500 text-center">
                 {isActionMode ? "No commands found" : "No tabs found"}
               </li>
             ) : isActionMode ? (
@@ -151,17 +165,17 @@ export function CommandPalette() {
                   <li
                     key={cmd.id}
                     ref={index === selectedIndex ? selectedItemRef : null}
-                    className={`p-3 cursor-pointer rounded-lg transition-colors ${
+                    className={`px-2 py-1 cursor-pointer ${
                       index === selectedIndex
-                        ? "bg-zinc-700 ring-2 ring-zinc-500"
-                        : "hover:bg-zinc-800"
+                        ? "bg-blue-100"
+                        : "hover:bg-gray-100"
                     }`}
                     onClick={() => handleSelection(cmd)}
                     onMouseEnter={() => setSelectedIndex(index)}
                   >
                     <div className="font-medium">{cmd.title}</div>
                     {cmd.description && (
-                      <div className="text-sm text-zinc-400">
+                      <div className="text-sm text-gray-600">
                         {cmd.description}
                       </div>
                     )}
@@ -176,10 +190,10 @@ export function CommandPalette() {
                   <li
                     key={tab.id}
                     ref={index === selectedIndex ? selectedItemRef : null}
-                    className={`p-3 cursor-pointer rounded-lg transition-colors flex items-center ${
+                    className={`px-2 py-1 cursor-pointer flex items-center ${
                       index === selectedIndex
-                        ? "bg-zinc-700 ring-2 ring-zinc-500"
-                        : "hover:bg-zinc-800"
+                        ? "bg-blue-100"
+                        : "hover:bg-gray-100"
                     }`}
                     onClick={() => handleSelection(tab)}
                     onMouseEnter={() => setSelectedIndex(index)}
@@ -191,7 +205,7 @@ export function CommandPalette() {
                         className="w-4 h-4 shrink-0 mr-3"
                       />
                     ) : (
-                      <div className="w-4 h-4 shrink-0 mr-3 bg-zinc-600 rounded-sm flex items-center justify-center text-[10px] text-zinc-300">
+                      <div className="w-4 h-4 shrink-0 mr-3 bg-gray-300 rounded-sm flex items-center justify-center text-[10px] text-gray-600">
                         🌐
                       </div>
                     )}
@@ -200,7 +214,7 @@ export function CommandPalette() {
                         {tab.title || "Untitled"}
                       </span>
                       {tab.url && (
-                        <span className="text-sm text-zinc-400 truncate flex-1">
+                        <span className="text-sm text-gray-600 truncate flex-1">
                           {tab.url}
                         </span>
                       )}
